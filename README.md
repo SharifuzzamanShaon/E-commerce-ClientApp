@@ -8,10 +8,9 @@ Next.js-based e-commerce frontend with Redux, Tailwind CSS, and API integration.
 - 🛒 Shopping cart & checkout (Redux)
 - 🔐 JWT authentication
 - 📦 Product management & search
-- 🌙 Dark mode support
 
 ## Tech Stack
-- **Frontend:** Next.js, React, Redux Toolkit
+- **Frontend:** Next.js, React, Redux Toolkit, TypeScript 
 - **Styling:** Tailwind 
 - **State Management:** Redux Toolkit & RTK Query
 - **API Calls:** Axios

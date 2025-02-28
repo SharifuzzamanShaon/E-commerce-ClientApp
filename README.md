@@ -1,5 +1,5 @@
 # E-Commerce Frontend
-
+## Currently working on this project
 Next.js-based e-commerce frontend with Redux, Tailwind CSS, and API integration.
 
 ## Features

@@ -12,7 +12,6 @@ const Signup = () => {
     password: "",
     re_type_password: "",
   });
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();

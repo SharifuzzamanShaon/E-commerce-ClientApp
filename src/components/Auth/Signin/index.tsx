@@ -1,8 +1,55 @@
+"use client"
 import Breadcrumb from "@/components/Common/Breadcrumb";
+import { useLoginMutation } from "@/redux/features/auth/authApi";
 import Link from "next/link";
-import React from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+const initialLoginForm = {
+  email: "",
+  password: "",
+};
 
 const Signin = () => {
+  const [loginCredential, setLoginCredential] = useState(initialLoginForm);
+  const [login, { isLoading, isError, error, isSuccess }] = useLoginMutation();
+  const router = useRouter();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setLoginCredential({ ...loginCredential, [e.target.name]: e.target.value });
+  };
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!loginCredential.email && !loginCredential.password) {
+      toast.error("Eamil and password required");
+      return;
+    }
+    await login(loginCredential)
+  };
+  let loadingToaster: string;
+  useEffect(() => {
+    if (isLoading) {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      loadingToaster = toast.loading("Logging to your account");
+    }
+    if (isSuccess) {
+      toast.dismiss(loadingToaster);
+      toast.success("Login success");
+      router.push("/");
+    }
+    if (error) {
+      toast.dismiss(loadingToaster);
+      if ("data" in error) {
+        const errorMessage =
+          (error.data as { message?: string })?.message ||
+          "Something went wrong, try again";
+        toast.error(errorMessage);
+      } else {
+        toast.error("Something went wrong, try again");
+      }
+    }
+  }, [isLoading, isError, error, isSuccess]);
   return (
     <>
       <Breadcrumb title={"Signin"} pages={["Signin"]} />
@@ -17,7 +64,7 @@ const Signin = () => {
             </div>
 
             <div>
-              <form>
+              <form onSubmit={handleSubmit}>
                 <div className="mb-5">
                   <label htmlFor="email" className="block mb-2.5">
                     Email
@@ -27,6 +74,8 @@ const Signin = () => {
                     type="email"
                     name="email"
                     id="email"
+                    value={loginCredential.email}
+                    onChange={handleChange}
                     placeholder="Enter your email"
                     className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
                   />
@@ -41,6 +90,8 @@ const Signin = () => {
                     type="password"
                     name="password"
                     id="password"
+                    value={loginCredential.password}
+                    onChange={handleChange}
                     placeholder="Enter your password"
                     autoComplete="on"
                     className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"

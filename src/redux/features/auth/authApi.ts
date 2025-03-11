@@ -12,9 +12,22 @@ export const authApi = apiSlice.injectEndpoints({
       }),
       async onQueryStarted(arg:any, { queryFulfilled, dispatch }) {
         try {
-          const response = await queryFulfilled;
-          console.log("Response:", response);
-
+          await queryFulfilled;
+        } catch (error) {
+          console.log(error);
+          return error
+        }
+      }
+    }),
+    login:builder.mutation({
+      query:(data)=>({
+        url:"auth/login",
+        method:"POST",
+        body:data
+      }),
+      async onQueryStarted(arg:any, {queryFulfilled, dispatch}){
+        try {
+          await queryFulfilled
         } catch (error) {
           console.log(error);
           return error
@@ -23,4 +36,4 @@ export const authApi = apiSlice.injectEndpoints({
     })
   })
 })
-export const { useRegisterMutation } = authApi
+export const { useRegisterMutation, useLoginMutation } = authApi

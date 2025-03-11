@@ -1,8 +1,86 @@
+"use client";
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import Link from "next/link";
-import React from "react";
-
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { useRegisterMutation } from "@/redux/features/auth/authApi";
 const Signup = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    re_type_password: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+  const [register, { isLoading, isError, error, isSuccess }] =
+    useRegisterMutation();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (
+        formData.name === "" ||
+        formData.email === "" ||
+        formData.password === "" ||
+        formData.re_type_password === ""
+      ) {
+        toast.error("All fields are required");
+        return;
+      }
+      if (formData.password !== formData.re_type_password) {
+        toast.error("Password not match");
+        return;
+      }
+      if (formData.password.length < 6) {
+        toast.error("Pasword minimum 6 char");
+        return;
+      }
+      const registerCredentials = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      };
+      console.log(registerCredentials);
+
+      await register(registerCredentials);
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.messaage);
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        re_type_password: "",
+      });
+    }
+  };
+
+  let loadingToaster: string;
+  useEffect(() => {
+    if (isLoading) {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      loadingToaster = toast.loading("Creating Account");
+    }
+    if (isSuccess) {
+      toast.dismiss(loadingToaster);
+      toast.success("Accont created | Please Login ");
+      router.push("/signin");
+    }
+    if (error) {
+      toast.dismiss(loadingToaster);
+      if ("data" in error) {
+        const errorMessage = (error.data as { message?: string })?.message || "Something went wrong, try again";
+        toast.error(errorMessage);
+      } else {
+        toast.error("Something went wrong, try again");
+      }
+    }
+  }, [isLoading, isError, error, isSuccess]);
   return (
     <>
       <Breadcrumb title={"Signup"} pages={["Signup"]} />
@@ -87,7 +165,7 @@ const Signup = () => {
             </span>
 
             <div className="mt-5.5">
-              <form>
+              <form onSubmit={handleSubmit}>
                 <div className="mb-5">
                   <label htmlFor="name" className="block mb-2.5">
                     Full Name <span className="text-red">*</span>
@@ -97,6 +175,8 @@ const Signup = () => {
                     type="text"
                     name="name"
                     id="name"
+                    value={formData.name}
+                    onChange={handleChange}
                     placeholder="Enter your full name"
                     className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
                   />
@@ -111,6 +191,8 @@ const Signup = () => {
                     type="email"
                     name="email"
                     id="email"
+                    value={formData.email}
+                    onChange={handleChange}
                     placeholder="Enter your email address"
                     className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
                   />
@@ -125,6 +207,8 @@ const Signup = () => {
                     type="password"
                     name="password"
                     id="password"
+                    value={formData.password}
+                    onChange={handleChange}
                     placeholder="Enter your password"
                     autoComplete="on"
                     className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
@@ -138,8 +222,10 @@ const Signup = () => {
 
                   <input
                     type="password"
-                    name="re-type-password"
-                    id="re-type-password"
+                    name="re_type_password"
+                    id="re_type_password"
+                    value={formData.re_type_password}
+                    onChange={handleChange}
                     placeholder="Re-type your password"
                     autoComplete="on"
                     className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"

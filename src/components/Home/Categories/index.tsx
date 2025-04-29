@@ -1,17 +1,17 @@
 "use client";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useCallback, useRef, useEffect } from "react";
-import data from "./categoryData";
 import Image from "next/image";
 
 // Import Swiper styles
 import "swiper/css/navigation";
 import "swiper/css";
 import SingleItem from "./SingleItem";
-
+import { useFetchCategoryQuery } from "@/redux/features/product/product";
 const Categories = () => {
   const sliderRef = useRef(null);
-
+const { data: categories, isLoading, error } = useFetchCategoryQuery()
+console.log(categories)
   const handlePrev = useCallback(() => {
     if (!sliderRef.current) return;
     sliderRef.current.swiper.slidePrev();
@@ -134,8 +134,8 @@ const Categories = () => {
               },
             }}
           >
-            {data.map((item, key) => (
-              <SwiperSlide key={key}>
+            {categories?.map((item, index) => (
+              <SwiperSlide key={item?._id || index}>
                 <SingleItem item={item} />
               </SwiperSlide>
             ))}

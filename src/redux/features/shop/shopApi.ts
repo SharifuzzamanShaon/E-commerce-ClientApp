@@ -2,10 +2,17 @@ import apiSlice from "../api/apiSlice";
 export const shopApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         fetchProdcut: builder.query({
-            query: () => ({
-                url: "product",
-                method: "GET",
-            }),
+            query: (query) => {
+                const params = new URLSearchParams();
+                if (query.categoryId) params.append("categoryId", query.categoryId);
+                if (query.size) params.append("size", query.size);
+                if (query.color) params.append("color", query.color);
+                if (query.price) params.append("price", query.price);
+                return {
+                  url: `product?${params.toString()}`,
+                  method: "GET",
+                };
+              },
             async onQueryStarted(arg: any, { queryFulfilled, dispatch }) {
                 try {
                     await queryFulfilled

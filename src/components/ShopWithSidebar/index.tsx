@@ -17,14 +17,14 @@ const ShopWithSidebar = () => {
   const [productStyle, setProductStyle] = useState("grid");
   const [productSidebar, setProductSidebar] = useState(false);
   const [stickyMenu, setStickyMenu] = useState(false);
+  const [query, setQuery] = useState({categoryId:"",size: "", color: "", price: ""});
   const {
     data: products,
     isLoading,
     isError,
     error,
     isSuccess,
-  } = useFetchProdcutQuery({});
-
+  } = useFetchProdcutQuery(query);
   let loadingItem;
   useEffect(() => {
     if (isLoading) {
@@ -32,11 +32,14 @@ const ShopWithSidebar = () => {
     }
     if (isSuccess) {
       toast.dismiss(loadingItem);
+      console.log(products);
     }
     if (isError) {
       toast.error("Failed to fetch products");
+      toast.dismiss(loadingItem);
+      console.log(error);
     }
-  }, [isLoading, isError, error, isSuccess]);
+  }, [query, isLoading, isError, error, isSuccess]);
   const handleStickyMenu = () => {
     if (window.scrollY >= 80) {
       setStickyMenu(true);
@@ -50,9 +53,6 @@ const ShopWithSidebar = () => {
     { label: "Best Selling", value: "1" },
     { label: "Old Products", value: "2" },
   ];
-
-
-
   const genders = [
     {
       name: "Men",
@@ -146,13 +146,13 @@ const ShopWithSidebar = () => {
                   </div>
 
                   {/* <!-- category box --> */}
-                  <CategoryDropdown />
+                  <CategoryDropdown setQuery={setQuery} />
 
                   {/* <!-- gender box --> */}
                   <GenderDropdown genders={genders} />
 
                   {/* // <!-- size box --> */}
-                  <SizeDropdown />
+                  <SizeDropdown  setQuery={setQuery}/>
 
                   {/* // <!-- color box --> */}
                   <ColorsDropdwon />

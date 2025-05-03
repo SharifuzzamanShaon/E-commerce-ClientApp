@@ -4,14 +4,29 @@ import Slider from "react-slider";
 import RangeSlider from "react-range-slider-input";
 import "react-range-slider-input/dist/style.css";
 
-const PriceDropdown = () => {
+const PriceDropdown = ({ setQuery }) => {
   const [toggleDropdown, setToggleDropdown] = useState(true);
 
   const [selectedPrice, setSelectedPrice] = useState({
     from: 0,
-    to: 100,
+    to: 1000,
   });
-
+  const handlePriceChange = (e: number[]) => {
+    setSelectedPrice({
+      from: Math.floor(e[0]),
+      to: Math.ceil(e[1]),
+    });
+    let timer = setTimeout(() => {
+      setQuery((prev: any) => ({
+        ...prev,
+        price: {
+          from: Math.floor(e[0]),
+          to: Math.ceil(e[1]),
+        },
+      }));
+    }, 100);
+    return () => clearTimeout(timer);
+  };
   return (
     <div className="bg-white shadow-1 rounded-lg">
       <div
@@ -52,15 +67,11 @@ const PriceDropdown = () => {
             <RangeSlider
               id="range-slider-gradient"
               className="margin-lg"
+              min={0}
+              max={1000}
               step={"any"}
-              onInput={(e) =>
-                setSelectedPrice({
-                  from: Math.floor(e[0]),
-                  to: Math.ceil(e[1]),
-                })
-              }
+              onInput={handlePriceChange}
             />
-
             <div className="price-amount flex items-center justify-between pt-4">
               <div className="text-custom-xs text-dark-4 flex rounded border border-gray-3/80">
                 <span className="block border-r border-gray-3/80 px-2.5 py-1.5">

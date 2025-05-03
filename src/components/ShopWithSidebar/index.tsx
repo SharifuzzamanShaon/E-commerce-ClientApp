@@ -7,7 +7,6 @@ import GenderDropdown from "./GenderDropdown";
 import SizeDropdown from "./SizeDropdown";
 import ColorsDropdwon from "./ColorsDropdwon";
 import PriceDropdown from "./PriceDropdown";
-import shopData from "../Shop/shopData";
 import SingleGridItem from "../Shop/SingleGridItem";
 import SingleListItem from "../Shop/SingleListItem";
 import { useFetchProdcutQuery } from "@/redux/features/shop/shopApi";
@@ -17,29 +16,55 @@ const ShopWithSidebar = () => {
   const [productStyle, setProductStyle] = useState("grid");
   const [productSidebar, setProductSidebar] = useState(false);
   const [stickyMenu, setStickyMenu] = useState(false);
-  const [query, setQuery] = useState({categoryId:"",size: "", color: "", price: ""});
-  const {
-    data: products,
-    isLoading,
-    isError,
-    error,
-    isSuccess,
-  } = useFetchProdcutQuery(query);
+
+const [query, setQuery] = useState({
+  categoryId: "",
+  size: "",
+  color: "",
+  price: { from: 0, to: 1000 },
+});
+
+const [debouncedQuery, setDebouncedQuery] = useState(query);
+useEffect(() => {
+  const handler = setTimeout(() => {
+    setDebouncedQuery(query);
+  }, 500);
+
+  return () => {
+    clearTimeout(handler);
+  };
+}, [query]);
+
+const {
+  data: products,
+  isLoading,
+  isError,
+  error,
+  isSuccess,
+} = useFetchProdcutQuery(debouncedQuery);
+
+// Toast notifications
+useEffect(() => {
   let loadingItem;
-  useEffect(() => {
-    if (isLoading) {
-      loadingItem = toast.loading("Loading...");
-    }
-    if (isSuccess) {
-      toast.dismiss(loadingItem);
-      console.log(products);
-    }
-    if (isError) {
-      toast.error("Failed to fetch products");
-      toast.dismiss(loadingItem);
-      console.log(error);
-    }
-  }, [query, isLoading, isError, error, isSuccess]);
+
+  if (isLoading) {
+    loadingItem = toast.loading("Loading...");
+  }
+
+  if (isSuccess) {
+    toast.dismiss(loadingItem);
+    console.log(products);
+  }
+
+  if (isError) {
+    toast.error("Failed to fetch products");
+    toast.dismiss(loadingItem);
+    console.log(error);
+  }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [debouncedQuery, isLoading, isError, error, isSuccess]);
+
   const handleStickyMenu = () => {
     if (window.scrollY >= 80) {
       setStickyMenu(true);
@@ -53,21 +78,6 @@ const ShopWithSidebar = () => {
     { label: "Best Selling", value: "1" },
     { label: "Old Products", value: "2" },
   ];
-  const genders = [
-    {
-      name: "Men",
-      products: 10,
-    },
-    {
-      name: "Women",
-      products: 23,
-    },
-    {
-      name: "Unisex",
-      products: 8,
-    },
-  ];
-
   useEffect(() => {
     window.addEventListener("scroll", handleStickyMenu);
 
@@ -86,6 +96,15 @@ const ShopWithSidebar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   });
+
+  const handleCleanAll = () => {
+    setQuery({
+      categoryId: "",
+      size: "",
+      color: "",
+      price: { from: 0, to: 1000 },
+    });
+  };
   return (
     <>
       <Breadcrumb
@@ -94,7 +113,7 @@ const ShopWithSidebar = () => {
       />
       <section className="overflow-hidden relative pb-20 pt-5 lg:pt-15 xl:pt-15 bg-[#f3f4f6]">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-          <div className="flex gap-7.5">
+          <div className="flex gap-7">
             {/* <!-- Sidebar Start --> */}
             <div
               className={`sidebar-content fixed xl:z-1 z-9999 left-0 top-0 xl:translate-x-0 xl:static max-w-[310px] xl:max-w-[270px] w-full ease-out duration-200 ${
@@ -141,7 +160,7 @@ const ShopWithSidebar = () => {
                   <div className="bg-white shadow-1 rounded-lg py-4 px-5">
                     <div className="flex items-center justify-between">
                       <p>Filters:</p>
-                      <button className="text-blue">Clean All</button>
+                      <button className="text-blue" onClick={handleCleanAll}>Clean All</button>
                     </div>
                   </div>
 
@@ -149,7 +168,6 @@ const ShopWithSidebar = () => {
                   <CategoryDropdown setQuery={setQuery} />
 
                   {/* <!-- gender box --> */}
-                  <GenderDropdown genders={genders} />
 
                   {/* // <!-- size box --> */}
                   <SizeDropdown  setQuery={setQuery}/>
@@ -158,7 +176,7 @@ const ShopWithSidebar = () => {
                   <ColorsDropdwon />
 
                   {/* // <!-- price range box --> */}
-                  <PriceDropdown />
+                  <PriceDropdown setQuery={setQuery} />
                 </div>
               </form>
             </div>
@@ -277,7 +295,7 @@ const ShopWithSidebar = () => {
               </div>
               {/* <!-- Products Grid Tab Content End --> */}
 
-              {/* <!-- Products Pagination Start --> */}
+              {/* <!--  Pagination Start --> */}
               <div className="flex justify-center mt-15">
                 <div className="bg-white shadow-1 rounded-md p-2">
                   <ul className="flex items-center">
@@ -393,7 +411,7 @@ const ShopWithSidebar = () => {
                   </ul>
                 </div>
               </div>
-              {/* <!-- Products Pagination End --> */}
+              {/* <!--  Pagination End --> */}
             </div>
             {/* // <!-- Content End --> */}
           </div>

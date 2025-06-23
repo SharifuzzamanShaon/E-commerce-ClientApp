@@ -7,9 +7,7 @@ const CategoryItem = ({ category, selectedId, expandedId, onSelect, onExpand }) 
   const isExpanded = category.id === expandedId;
   const [expandedSubCategoryId, setExpandedSubCategoryId] = useState(null);
   const handleFetchDataByCategory = (categoryId) => {
-    // This function can be used to fetch data based on the selected category
     console.log(`Fetching data for category ID: ${categoryId}`);
-    // Implement your data fetching logic here
   };
   return (
     <div className="w-full">

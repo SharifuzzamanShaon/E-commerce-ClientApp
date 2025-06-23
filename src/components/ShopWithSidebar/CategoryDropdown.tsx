@@ -6,7 +6,11 @@ const CategoryItem = ({ category, selectedId, expandedId, onSelect, onExpand }) 
   const isSelected = category.id === selectedId;
   const isExpanded = category.id === expandedId;
   const [expandedSubCategoryId, setExpandedSubCategoryId] = useState(null);
-
+  const handleFetchDataByCategory = (categoryId) => {
+    // This function can be used to fetch data based on the selected category
+    console.log(`Fetching data for category ID: ${categoryId}`);
+    // Implement your data fetching logic here
+  };
   return (
     <div className="w-full">
       <button
@@ -29,7 +33,7 @@ const CategoryItem = ({ category, selectedId, expandedId, onSelect, onExpand }) 
             }`}
           >
           </div>
-          <span>{category?.name}</span>
+          <span onClick={() => handleFetchDataByCategory(category.id)}>{category?.name} #</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -79,7 +83,7 @@ const CategoryItem = ({ category, selectedId, expandedId, onSelect, onExpand }) 
                 }}
               >
                 <div className="flex items-center gap-2">
-                  <span>{subCategory.name}</span>
+                  <span onClick={() => handleFetchDataByCategory(subCategory.id)}>{subCategory.name} </span>
                   {subCategory?.SubSubCategory?.length > 0 && (
                     <svg
                       className={`w-3 h-3 transition-transform duration-200 ${
@@ -117,7 +121,7 @@ const CategoryItem = ({ category, selectedId, expandedId, onSelect, onExpand }) 
                         onSelect(subSubCategory.id);
                       }}
                     >
-                      <span>{subSubCategory.name}</span>
+                      <span onClick={() => handleFetchDataByCategory(subSubCategory.id)}>{subSubCategory.name}</span>
                       <span className={`${
                         selectedId === subSubCategory.id ? "text-white bg-blue" : "bg-gray-2"
                       } inline-flex rounded-[30px] text-custom-xs px-2 ease-out duration-200 group-hover:text-white group-hover:bg-blue`}>

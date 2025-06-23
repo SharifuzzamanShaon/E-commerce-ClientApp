@@ -2,7 +2,7 @@
 import { useFetchAllCategoryQuery } from "@/redux/features/shop/shopApi";
 import { useEffect, useState } from "react";
 
-const CategoryItem = ({ category, selectedId, expandedId, onSelect, onExpand }) => {
+const CategoryItem = ({ category, selectedId, expandedId, onSelect, onExpand, setQuery }) => {
   const isSelected = category.id === selectedId;
   const isExpanded = category.id === expandedId;
   const [expandedSubCategoryId, setExpandedSubCategoryId] = useState(null);
@@ -115,6 +115,8 @@ const CategoryItem = ({ category, selectedId, expandedId, onSelect, onExpand }) 
                         selectedId === subSubCategory.id ? "text-blue" : "text-gray-600"
                       } hover:text-blue transition-colors duration-200`}
                       onClick={(e) => {
+                        setQuery({categoryId: subSubCategory.id});
+                        console.log(subSubCategory.id);
                         e.stopPropagation();
                         onSelect(subSubCategory.id);
                       }}
@@ -137,14 +139,12 @@ const CategoryItem = ({ category, selectedId, expandedId, onSelect, onExpand }) 
   );
 };
 
-const CategoryDropdown = () => {
+const CategoryDropdown = ({setQuery}) => {
   const [toggleDropdown, setToggleDropdown] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const { data: categories, isLoading, isError, error, isSuccess }: any =
     useFetchAllCategoryQuery({});
-
-  console.log(categories);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -163,7 +163,7 @@ const CategoryDropdown = () => {
           toggleDropdown && "shadow-filter"
         }`}
       >
-        <p className="text-dark">Category</p>
+        <p className="text-dark">All Category </p>
         <button
           aria-label="button for category dropdown"
           className={`text-dark ease-out duration-200 ${
@@ -200,6 +200,7 @@ const CategoryDropdown = () => {
             expandedId={expandedId}
             onSelect={setSelectedId}
             onExpand={setExpandedId}
+            setQuery={setQuery}
           />
         ))}
       </div>
